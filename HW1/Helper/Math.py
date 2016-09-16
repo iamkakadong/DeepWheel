@@ -1,12 +1,14 @@
-from numpy import exp
+import numpy as np
 
 def softmax(a):
 	"""
 
 	:rtype: ndarray
 	"""
-	t1 = exp(a)
-	return t1 / t1.sum()
+
+	e_x = np.exp(a - np.max(a))
+	out = e_x / e_x.sum()
+	return out
 
 def sigmoid(a):
-	return 1 / (1 + exp(-a))
+	return 1 / (1 + np.exp(-a))

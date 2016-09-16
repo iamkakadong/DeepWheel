@@ -1,5 +1,5 @@
-from numpy.random import rand
+from numpy.random import uniform
 
 
 def uniformInit(dim, lb, ub):
-	return (rand(dim[0], dim[1]) + (ub + lb) / 2.0) * abs(ub - lb)
+	return uniform(lb, ub, dim)
