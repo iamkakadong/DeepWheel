@@ -41,7 +41,8 @@ class Layer:
 	def __init__(self, n_in, n_out, momentum, reg_param, dropout):
 		self.n_in = n_in
 		self.n_out = n_out
-		self.weights = RandomInit.uniformInit([n_out, n_in + 1], -1, 1)
+		self.weights = RandomInit.uniformInit([n_out, n_in + 1], -np.sqrt(6)/np.sqrt(n_in + n_out), np.sqrt(6)/np.sqrt(n_in + n_out))
+		self.weights[:,-1] = 0
 		self.weight_gradient = np.zeros([n_out, n_in + 1])
 		self.momentum = momentum
 		self.reg_param = reg_param

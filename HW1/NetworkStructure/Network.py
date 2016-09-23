@@ -3,6 +3,7 @@ from ..Layers.Softmax import Softmax
 from ..Layers.Layer import Layer
 from ..Helper import LossFun
 import numpy as np
+import matplotlib.pyplot as plt
 
 class Network:
 	n_layers = 0
@@ -12,19 +13,46 @@ class Network:
 	l2_weight = 0.0
 	momentum = 0.0
 	layers = list()
-	n_features = 0
+
+	def visualizeLayer(self, layer_idx):
+		# Visualize i-th layer
+		assert layer_idx != 0
+		tmp = self.layers[layer_idx - 1].weights[:, :-1]
+		size = int(np.ceil(np.sqrt(self.n_units[layer_idx][0])))
+		f, axarr = plt.subplots(size, size)
+		for i in range(size):
+			for j in range(size):
+				idx = i * size + j
+				vis_dim = int(np.sqrt(self.n_units[layer_idx - 1][0]))
+				axarr[i,j].matshow(np.reshape(tmp[idx,:], [vis_dim, vis_dim]), cmap = plt.cm.gray)
+				axarr[i,j].axis('off')
+		return f
+
+	def printStruct(self):
+		s = "["
+		for n_unit in self.n_units[:-1]:
+			s += str(n_unit) + "->"
+		s += str(self.n_units[-1]) + "];\n"
+		s += ("lr %0.2f; " % self.learning_rate)
+		s += ("dr %0.2f; " % self.dropout_rate)
+		s += ("momentum %0.2f; " % self.momentum)
+		s += ("l2 %0.2f" % self.l2_weight)
+		return s
 
 	def initNetwork(self):
 		# Check network is correctly specified
 		if (not self.isValidNetwork()):
 			return
 
+		in_size = 0
 		layers = list()
-		in_size = self.n_features
 		for u in self.n_units:
 			out_size = u[0]
 			type = u[1]
-			if (type == "Sigmoid"):
+			if (type == "Input"):
+				in_size = out_size
+				continue
+			elif (type == "Sigmoid"):
 				layers.append(Sigmoid(in_size, out_size, self.momentum, self.l2_weight))
 			elif (type == "Softmax"):
 				layers.append(Softmax(in_size, out_size, self.momentum, self.l2_weight))
@@ -45,16 +73,16 @@ class Network:
 		acc_val = list()
 		for i in range(epoch):
 			print "epoch # %d: " % i
-			print "Training..."
-			[ct, at] = self.train(X_train, y_train, 1)
-			cel_train.extend(ct)
-			acc_train.extend(at)
-			print "    CE: %0.3f; ACC: %0.3f" % (ct[0], at[0])
 			print "Validating..."
 			[ct, at] = self.validate(X_val, y_val)
 			cel_val.append(ct)
 			acc_val.append(at)
 			print "    CE: %0.3f; ACC: %0.3f" % (ct, at)
+			print "Training..."
+			[ct, at] = self.train(X_train, y_train, 1)
+			cel_train.extend(ct)
+			acc_train.extend(at)
+			print "    CE: %0.3f; ACC: %0.3f" % (ct[0], at[0])
 		return [cel_train, acc_train, cel_val, acc_val]
 
 	def validate(self, X, y):
@@ -112,6 +140,7 @@ class Network:
 
 	def setLayer(self, n, units):
 		assert len(units) == n
+		assert units[0][1] == "Input"
 		self.n_layers = n
 		self.n_units = units
 
@@ -126,9 +155,6 @@ class Network:
 
 	def setMomentum(self, momentum):
 		self.momentum = momentum
-
-	def setFeatures(self, n_features):
-		self.n_features = n_features
 
 	def isValidNetwork(self):
 		if self.n_layers == 0:

@@ -13,7 +13,7 @@ class Sigmoid(Layer):
 		"""
 		assert len(post_activation_gradient) == self.n_out
 		pre_activation_gradient = post_activation_gradient * self.d_out * (1 - self.d_out)
-		weight_gradient = np.outer(pre_activation_gradient, self.d_in)
+		weight_gradient = self.weight_gradient * self.momentum + np.outer(pre_activation_gradient, self.d_in)
 		in_post_gradient = np.dot(self.weights[:, 0 : -1].transpose(), pre_activation_gradient)
 		self.gradient = in_post_gradient
 		self.weight_gradient = weight_gradient
