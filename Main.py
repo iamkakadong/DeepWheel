@@ -1,6 +1,7 @@
 from HW1.NetworkStructure import Network
 import numpy as np
 import matplotlib.pyplot as plt
+import pickle
 
 def loadData(filename):
 	X = list()
@@ -42,6 +43,7 @@ def cross_validation(myNet):
 
 	:type myNet: Network.Network
 	"""
+	cv_res = list()
 	for learning_rate in [0.01, 0.1, 0.5]:
 		for momentum in [0, 0.5]:
 			for hidden_unit in [100, 200, 500]:
@@ -58,16 +60,25 @@ def cross_validation(myNet):
 
 							name = genFileName(learning_rate, momentum, hidden_unit, epochs, regularization, dropout_rate)
 							fig = plotError(myNet, loss, vloss, "Cross-entropy Loss")
-							fig.savefig('../HW1/Results/ce_loss' + name + '.png', format='png')
+							fig.savefig('Results/ce_loss' + name + '.png', format='png')
 							fig = plotError(myNet, closs, vcloss, "Misclassification Error")
-							fig.savefig('../HW1/Results/mc_loss_' + name + '.png', format='png')
+							fig.savefig('Results/mc_loss_' + name + '.png', format='png')
+							print "cross-validation result for " + name + ":\n"
+							print "\ttraining cross-entropy loss: %0.3f\n" % loss
+							print "\ttraining error rate: %0.3f\n" % closs
+							print "\tcross-validation cross-entropy loss: %0.3f\n" % vloss
+							print "\tcross-validation error rate: %0.3f\n" % vcloss
+							cv_res.append([loss,closs,vloss,vcloss,name])
+	return cv_res
 
 if __name__ == '__main__':
 	[X_train, y_train] = loadData("HW1/data/digitstrain.txt")
 	[X_val, y_val] = loadData("HW1/data/digitsvalid.txt")
 
 	myNet = Network.Network()
-	cross_validation(myNet)
+	cv_res = cross_validation(myNet)
+	with open('cv_result', 'wb') as f:
+		pickle.dump(cv_res, f)
 
 	# myNet.setLayer(3, [[784, "Input"], [500, "Sigmoid"], [10, "Softmax"]])
 	# myNet.setLearningRate(0.01)
