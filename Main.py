@@ -1,7 +1,6 @@
 from HW1.NetworkStructure import Network
 import numpy as np
-import random
-import matplotlib.pyplot as plt
+import matplotlib
 
 def loadData(filename):
 	X = list()
@@ -33,6 +32,9 @@ def plotError(network, training_loss, cv_loss, loss_label):
 	return fig
 
 if __name__ == '__main__':
+	matplotlib.use('Agg')
+	import matplotlib.pyplot as plt
+
 	[X_train, y_train] = loadData("/Users/tianshuren/Google Drive/2016 Fall/10807/Code/HW1/data/digitstrain.txt")
 	[X_val, y_val] = loadData("/Users/tianshuren/Google Drive/2016 Fall/10807/Code/HW1/data/digitsvalid.txt")
 
