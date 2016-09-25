@@ -31,24 +31,57 @@ def plotError(network, training_loss, cv_loss, loss_label):
 	plt.legend()
 	return fig
 
+def sciFormat(num):
+	return "{:.2E}".format(num)
+
+def genFileName(lr, mo, hu, ep, l2, dr):
+	return "lr_" + sciFormat(lr) + "_mo_" + sciFormat(mo) + "_hu_" + sciFormat(hu) + "_ep_" + sciFormat(ep) + "_l2_" + sciFormat(l2) + "_dr_" + sciFormat(dr)
+
+def cross_validation(myNet):
+	"""
+
+	:type myNet: Network.Network
+	"""
+	for learning_rate in [0.01, 0.1, 0.5]:
+		for momentum in [0, 0.5]:
+			for hidden_unit in [100, 200, 500]:
+				for epochs in [50, 150, 250]:
+					for regularization in [0, 0.1, 0.5]:
+						for dropout_rate in [0, 0.5]:
+							myNet.setLayer(3, [[784, "Input"], [hidden_unit, "Sigmoid"], [10, "Softmax"]])
+							myNet.setLearningRate(learning_rate)
+							myNet.setMomentum(momentum)
+							myNet.setL2Weight(regularization)
+							myNet.setDropOutRate(dropout_rate)
+							myNet.initNetwork()
+							[loss, closs, vloss, vcloss] = myNet.trainAndValidate(X_train, y_train, X_val, y_val, epochs)
+
+							name = genFileName(learning_rate, momentum, hidden_unit, epochs, regularization, dropout_rate)
+							fig = plotError(myNet, loss, vloss, "Cross-entropy Loss")
+							fig.savefig('../HW1/Results/ce_loss' + name + '.png', format='png')
+							fig = plotError(myNet, closs, vcloss, "Misclassification Error")
+							fig.savefig('../HW1/Results/mc_loss_' + name + '.png', format='png')
+
 if __name__ == '__main__':
 	[X_train, y_train] = loadData("HW1/data/digitstrain.txt")
 	[X_val, y_val] = loadData("HW1/data/digitsvalid.txt")
 
 	myNet = Network.Network()
-	myNet.setLayer(3, [[784, "Input"], [500, "Sigmoid"], [10, "Softmax"]])
-	myNet.setLearningRate(0.01)
-	myNet.initNetwork()
-	myNet.setMomentum(0.5)
-	myNet.setL2Weight(0.0)
-	myNet.setDropOutRate(0.5)
-	epochs = 200
+	cross_validation(myNet)
 
-	[loss, closs, vloss, vcloss] = myNet.trainAndValidate(X_train, y_train, X_val, y_val, epochs)
+	# myNet.setLayer(3, [[784, "Input"], [500, "Sigmoid"], [10, "Softmax"]])
+	# myNet.setLearningRate(0.01)
+	# myNet.initNetwork()
+	# myNet.setMomentum(0.5)
+	# myNet.setL2Weight(0.0)
+	# epochs = 200
+	#
+	# [loss, closs, vloss, vcloss] = myNet.trainAndValidate(X_train, y_train, X_val, y_val, epochs)
+	#
+	# fig = plotError(myNet, loss, vloss, "Cross-entropy Loss")
+	# fig.savefig('../HW1/Results/ce_loss_lr1e-2_mo5e-1_hl5e+2.png', format='png')
+	# fig = plotError(myNet, closs, vcloss, "Misclassification Error")
+	# fig.savefig('../HW1/Results/mc_loss_lr1e-2_mo5e-1_hl5e+2.png', format='png')
+	# # fig = myNet.visualizeLayer(1)
+	# # fig.savefig('../HW1/Results/visualize_weight.png', format='png')
 
-	fig = plotError(myNet, loss, vloss, "Cross-entropy Loss")
-	fig.savefig('Results/ce_loss_lr1e-2_mo5e-1_hl5e+2_dr5e-1.png', format='png')
-	fig = plotError(myNet, closs, vcloss, "Misclassification Error")
-	fig.savefig('Results/mc_loss_lr1e-2_mo5e-1_hl5e+2_dr5e-1.png', format='png')
-	# fig = myNet.visualizeLayer(1)
-	# fig.savefig('../HW1/Results/visualize_weight.png', format='png')
