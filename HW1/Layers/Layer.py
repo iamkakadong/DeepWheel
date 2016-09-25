@@ -14,7 +14,17 @@ class Layer:
 	weight_gradient = np.ndarray([0])
 	momentum = 0.0
 	reg_param = 0.0
-	dropout = 0.0
+	dropout_rate = 0.0
+
+	def feedForwardTrain(self):
+		self.feedForward()
+		if self.dropout_rate != 0:
+			self.dropout()
+
+	def feedForwardTest(self):
+		self.feedForward()
+		if self.dropout_rate != 0:
+			self.d_out *= (1 - self.dropout_rate)
 
 	@abstractmethod
 	def feedForward(self):
@@ -38,6 +48,9 @@ class Layer:
 	def hasIn(self):
 		return self.d_in != None
 
+	def dropout(self):
+		self.d_out *= np.random.binomial(1, self.dropout_rate, self.n_out)
+
 	def __init__(self, n_in, n_out, momentum, reg_param, dropout):
 		self.n_in = n_in
 		self.n_out = n_out
@@ -46,4 +59,4 @@ class Layer:
 		self.weight_gradient = np.zeros([n_out, n_in + 1])
 		self.momentum = momentum
 		self.reg_param = reg_param
-		self.dropout = dropout
+		self.dropout_rate = dropout

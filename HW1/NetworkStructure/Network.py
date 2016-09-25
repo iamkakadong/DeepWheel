@@ -61,6 +61,9 @@ class Network:
 				return
 			in_size = out_size
 
+		tmp = layers[-1]
+		assert isinstance(tmp, Layer)
+		tmp.dropout_rate = 0.0	# Do not do dropout in output layer
 		self.layers = layers
 
 	def reset(self):
@@ -102,7 +105,7 @@ class Network:
 			cel_accumulator = list()
 			acc_accumulator = list()
 			for j in np.random.permutation(range(len(y))):
-				self.forwardProp(X[j])
+				self.forwardPropTrain(X[j])
 				cel_accumulator.append(self.getLoss(y[j], LossFun.crossEntropy))
 				acc_accumulator.append(self.getLoss(y[j], LossFun.classificationError))
 				self.backProp(y[j])
@@ -110,7 +113,7 @@ class Network:
 			acc.append(np.mean(acc_accumulator))
 		return cel, acc
 
-	def forwardProp(self, input):
+	def forwardPropTrain(self, input):
 		"""
 
 		:type input: np.ndarray
@@ -119,7 +122,15 @@ class Network:
 		for layer in self.layers:
 			assert isinstance(layer, Layer)
 			layer.setInput(current_output)
-			layer.feedForward()
+			layer.feedForwardTrain()
+			current_output = layer.d_out
+
+	def forwardProp(self, input):
+		current_output = input
+		for layer in self.layers:
+			assert isinstance(layer, Layer)
+			layer.setInput(current_output)
+			layer.feedForwardTest()
 			current_output = layer.d_out
 
 	def getLoss(self, truth, function):

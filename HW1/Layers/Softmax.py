@@ -10,7 +10,6 @@ class Softmax(Layer):
 		self.d_out = Math.softmax(self.weights.dot(self.d_in))
 
 	def backProp(self, post_activation_gradient):
-		# TODO: Implement momentum, regularization
 		assert len(post_activation_gradient) == self.n_out
 		t1 = self.d_out
 		t2 = - np.outer(t1, t1) + np.diag(t1)

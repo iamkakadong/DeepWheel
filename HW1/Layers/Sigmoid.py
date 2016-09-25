@@ -6,7 +6,6 @@ from Layer import Layer
 class Sigmoid(Layer):
 
 	def backProp(self, post_activation_gradient):
-		# TODO: Implement momentum, regularization
 		"""
 
 		:type post_activation_gradient: np.ndarray
