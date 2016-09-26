@@ -2,6 +2,8 @@ from HW1.NetworkStructure import Network
 import numpy as np
 import matplotlib.pyplot as plt
 import pickle
+import multiprocessing
+import os.path
 
 def loadData(filename):
 	X = list()
@@ -44,32 +46,62 @@ def cross_validation(myNet):
 	:type myNet: Network.Network
 	"""
 	cv_res = list()
+	params = list()
 	for learning_rate in [0.01, 0.1, 0.5]:
 		for momentum in [0, 0.5]:
 			for hidden_unit in [100, 200, 500]:
 				for epochs in [50, 150, 250]:
 					for regularization in [0, 0.1, 0.5]:
 						for dropout_rate in [0, 0.5]:
-							myNet.setLayer(3, [[784, "Input"], [hidden_unit, "Sigmoid"], [10, "Softmax"]])
-							myNet.setLearningRate(learning_rate)
-							myNet.setMomentum(momentum)
-							myNet.setL2Weight(regularization)
-							myNet.setDropOutRate(dropout_rate)
-							myNet.initNetwork()
-							[loss, closs, vloss, vcloss] = myNet.trainAndValidate(X_train, y_train, X_val, y_val, epochs)
+							param = dict()
+							param['learning_rate'] = learning_rate
+							param['momentum'] = momentum
+							param['hidden_unit'] = hidden_unit
+							param['epochs'] = epochs
+							param['regularziation'] = regularization
+							param['dropout_rate'] = dropout_rate
+							param['cv_res'] = cv_res
+							param['myNet'] = myNet
+							params.append(param)
+	pool = multiprocessing.Pool(processes=10)
+	pool.map(subroutine, params)
+	pool.close()
+	pool.join()
 
-							name = genFileName(learning_rate, momentum, hidden_unit, epochs, regularization, dropout_rate)
-							fig = plotError(myNet, loss, vloss, "Cross-entropy Loss")
-							fig.savefig('Results/ce_loss' + name + '.png', format='png')
-							fig = plotError(myNet, closs, vcloss, "Misclassification Error")
-							fig.savefig('Results/mc_loss_' + name + '.png', format='png')
-							print "cross-validation result for " + name + ":\n"
-							print "\ttraining cross-entropy loss: %0.3f\n" % loss
-							print "\ttraining error rate: %0.3f\n" % closs
-							print "\tcross-validation cross-entropy loss: %0.3f\n" % vloss
-							print "\tcross-validation error rate: %0.3f\n" % vcloss
-							cv_res.append([loss,closs,vloss,vcloss,name])
 	return cv_res
+
+def subroutine(param):
+	learning_rate = param['learning_rate']
+	momentum = param['momentum']
+	hidden_unit = param['hidden_unit']
+	epochs = param['epochs']
+	regularization = param['regularziation']
+	dropout_rate = param['dropout_rate']
+
+	cv_res = param['cv_res']
+	myNet = param['myNet']
+
+	name = genFileName(learning_rate, momentum, hidden_unit, epochs, regularization, dropout_rate)
+	if not os.path.isfile('Results/ce_loss_' + name + '.png'):
+		myNet.setLayer(3, [[784, "Input"], [hidden_unit, "Sigmoid"], [10, "Softmax"]])
+		myNet.setLearningRate(learning_rate)
+		myNet.setMomentum(momentum)
+		myNet.setL2Weight(regularization)
+		myNet.setDropOutRate(dropout_rate)
+		myNet.initNetwork()
+		[loss, closs, vloss, vcloss] = myNet.trainAndValidate(X_train, y_train, X_val, y_val, epochs)
+
+		fig = plotError(myNet, loss, vloss, "Cross-entropy Loss")
+		fig.savefig('Results/ce_loss_' + name + '.png', format='png')
+		fig = plotError(myNet, closs, vcloss, "Misclassification Error")
+		fig.savefig('Results/mc_loss_' + name + '.png', format='png')
+		print "cross-validation result for " + name + ":\n"
+		print "\ttraining cross-entropy loss: %0.3f\n" % loss
+		print "\ttraining error rate: %0.3f\n" % closs
+		print "\tcross-validation cross-entropy loss: %0.3f\n" % vloss
+		print "\tcross-validation error rate: %0.3f\n" % vcloss
+		cv_res.append([loss,closs,vloss,vcloss,name])
+
 
 if __name__ == '__main__':
 	[X_train, y_train] = loadData("HW1/data/digitstrain.txt")
