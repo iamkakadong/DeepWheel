@@ -71,6 +71,7 @@ def cross_validation(myNet):
 	return cv_res
 
 def subroutine(param):
+	myNet = Network.Network()
 	learning_rate = param['learning_rate']
 	momentum = param['momentum']
 	hidden_unit = param['hidden_unit']
@@ -79,7 +80,6 @@ def subroutine(param):
 	dropout_rate = param['dropout_rate']
 
 	cv_res = param['cv_res']
-	myNet = param['myNet']
 
 	name = genFileName(learning_rate, momentum, hidden_unit, epochs, regularization, dropout_rate)
 	if not os.path.isfile('Results/ce_loss_' + name + '.png'):
@@ -107,8 +107,8 @@ if __name__ == '__main__':
 	[X_train, y_train] = loadData("HW1/data/digitstrain.txt")
 	[X_val, y_val] = loadData("HW1/data/digitsvalid.txt")
 
-	myNet = Network.Network()
-	cv_res = cross_validation(myNet)
+	# myNet = Network.Network()
+	cv_res = cross_validation()
 	with open('cv_result', 'wb') as f:
 		pickle.dump(cv_res, f)
 
