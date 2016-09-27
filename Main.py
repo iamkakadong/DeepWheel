@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import pickle
 import multiprocessing
 import os.path
+from HW1.Helper import String
 
 def loadData(filename):
 	X = list()
@@ -33,12 +34,6 @@ def plotError(network, training_loss, cv_loss, loss_label):
 	plt.title(network.printStruct())
 	plt.legend()
 	return fig
-
-def sciFormat(num):
-	return "{:.2E}".format(num)
-
-def genFileName(lr, mo, hu, ep, l2, dr):
-	return "lr_" + sciFormat(lr) + "_mo_" + sciFormat(mo) + "_hu_" + sciFormat(hu) + "_ep_" + sciFormat(ep) + "_l2_" + sciFormat(l2) + "_dr_" + sciFormat(dr)
 
 def cross_validation():
 	cv_res = list()
@@ -76,7 +71,7 @@ def subroutine(param):
 
 	# cv_res = param['cv_res']
 
-	name = genFileName(learning_rate, momentum, hidden_unit, epochs, regularization, dropout_rate)
+	name = myNet.getName() + '_ep_' + String.sciFormat(epochs)
 	if not os.path.isfile('Results/ce_loss_' + name + '.png'):
 		myNet.setLayer(3, [[784, "Input"], [hidden_unit, "Sigmoid"], [10, "Softmax"]])
 		myNet.setLearningRate(learning_rate)

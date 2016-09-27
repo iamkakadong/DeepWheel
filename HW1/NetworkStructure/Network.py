@@ -1,7 +1,7 @@
 from ..Layers.Sigmoid import Sigmoid
 from ..Layers.Softmax import Softmax
 from ..Layers.Layer import Layer
-from ..Helper import LossFun
+from ..Helper import LossFun, String
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -29,10 +29,7 @@ class Network:
 		return f
 
 	def printStruct(self):
-		s = "["
-		for n_unit in self.n_units[:-1]:
-			s += str(n_unit) + "->"
-		s += str(self.n_units[-1]) + "];\n"
+		s = self.getLayerStruct() + ";\n"
 		s += ("lr %0.2f; " % self.learning_rate)
 		s += ("dr %0.2f; " % self.dropout_rate)
 		s += ("momentum %0.2f; " % self.momentum)
@@ -178,6 +175,17 @@ class Network:
 			print 'Learning rate is 0'
 			return False
 		return True
+
+	def getLayerStruct(self):
+		s = "["
+		for n_unit in self.n_units[:-1]:
+			s += str(n_unit) + "->"
+		s += str(self.n_units[-1]) + "]"
+		return s
+
+	def getName(self):
+		return "lr_" + String.sciFormat(self.learning_rate) + "_mo_" + String.sciFormat(self.momentum) + \
+			   "_hu_" + self.getLayerStruct() +"_l2_" + String.sciFormat(self.l2_weight) + "_dr_" + String.sciFormat(self.dropout_rate)
 
 	def __init__(self):
 		return
