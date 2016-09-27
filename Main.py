@@ -40,11 +40,7 @@ def sciFormat(num):
 def genFileName(lr, mo, hu, ep, l2, dr):
 	return "lr_" + sciFormat(lr) + "_mo_" + sciFormat(mo) + "_hu_" + sciFormat(hu) + "_ep_" + sciFormat(ep) + "_l2_" + sciFormat(l2) + "_dr_" + sciFormat(dr)
 
-def cross_validation(myNet):
-	"""
-
-	:type myNet: Network.Network
-	"""
+def cross_validation():
 	cv_res = list()
 	params = list()
 	for learning_rate in [0.01, 0.1, 0.5]:
@@ -61,10 +57,9 @@ def cross_validation(myNet):
 							param['regularziation'] = regularization
 							param['dropout_rate'] = dropout_rate
 							param['cv_res'] = cv_res
-							param['myNet'] = myNet
 							params.append(param)
 	pool = multiprocessing.Pool(processes=10)
-	pool.map(subroutine, params)
+	cv_res = pool.map(subroutine, params)
 	pool.close()
 	pool.join()
 
@@ -79,7 +74,7 @@ def subroutine(param):
 	regularization = param['regularziation']
 	dropout_rate = param['dropout_rate']
 
-	cv_res = param['cv_res']
+	# cv_res = param['cv_res']
 
 	name = genFileName(learning_rate, momentum, hidden_unit, epochs, regularization, dropout_rate)
 	if not os.path.isfile('Results/ce_loss_' + name + '.png'):
@@ -100,8 +95,8 @@ def subroutine(param):
 		print "\ttraining error rate: %0.3f\n" % closs
 		print "\tcross-validation cross-entropy loss: %0.3f\n" % vloss
 		print "\tcross-validation error rate: %0.3f\n" % vcloss
-		cv_res.append([loss,closs,vloss,vcloss,name])
-
+		# cv_res.append([loss,closs,vloss,vcloss,name])
+		return [loss,closs,vloss,vcloss,name]
 
 if __name__ == '__main__':
 	[X_train, y_train] = loadData("HW1/data/digitstrain.txt")
