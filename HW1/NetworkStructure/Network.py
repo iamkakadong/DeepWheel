@@ -184,6 +184,10 @@ class Network:
 		return s
 
 	def getName(self):
+		if len(self.n_units) == 0:
+			print 'Network is Empty!'
+			return
+
 		return "lr_" + String.sciFormat(self.learning_rate) + "_mo_" + String.sciFormat(self.momentum) + \
 			   "_hu_" + self.getLayerStruct() +"_l2_" + String.sciFormat(self.l2_weight) + "_dr_" + String.sciFormat(self.dropout_rate)
 

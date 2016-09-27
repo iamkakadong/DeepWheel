@@ -53,10 +53,11 @@ def cross_validation():
 							param['dropout_rate'] = dropout_rate
 							param['cv_res'] = cv_res
 							params.append(param)
-	pool = multiprocessing.Pool(processes=10)
-	cv_res = pool.map(subroutine, params)
-	pool.close()
-	pool.join()
+	subroutine(params[0])
+	# pool = multiprocessing.Pool(processes=2)
+	# cv_res = pool.map(subroutine, params)
+	# pool.close()
+	# pool.join()
 
 	return cv_res
 
@@ -71,14 +72,15 @@ def subroutine(param):
 
 	# cv_res = param['cv_res']
 
+	myNet.setLayer(3, [[784, "Input"], [hidden_unit, "Sigmoid"], [10, "Softmax"]])
+	myNet.setLearningRate(learning_rate)
+	myNet.setMomentum(momentum)
+	myNet.setL2Weight(regularization)
+	myNet.setDropOutRate(dropout_rate)
+	myNet.initNetwork()
+
 	name = myNet.getName() + '_ep_' + String.sciFormat(epochs)
 	if not os.path.isfile('Results/ce_loss_' + name + '.png'):
-		myNet.setLayer(3, [[784, "Input"], [hidden_unit, "Sigmoid"], [10, "Softmax"]])
-		myNet.setLearningRate(learning_rate)
-		myNet.setMomentum(momentum)
-		myNet.setL2Weight(regularization)
-		myNet.setDropOutRate(dropout_rate)
-		myNet.initNetwork()
 		[loss, closs, vloss, vcloss] = myNet.trainAndValidate(X_train, y_train, X_val, y_val, epochs)
 
 		fig = plotError(myNet, loss, vloss, "Cross-entropy Loss")
