@@ -1,10 +1,10 @@
 import matplotlib.pyplot as plt
 import numpy as np
-from ..Helper import LossFun, String
+from Helper import LossFun, String
 
-from ..Layers import Layer
-from ..Layers import Sigmoid
-from ..Layers import Softmax
+from Layers.Layer import Layer
+from Layers.Sigmoid import Sigmoid
+from Layers.Softmax import Softmax
 
 
 class Network:

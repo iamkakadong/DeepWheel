@@ -2,9 +2,9 @@ import os.path
 
 import matplotlib.pyplot as plt
 
-from ..NetworkStructure import Network
-from ..Helper import Loader
-from ..Helper import String
+from NetworkStructure import Network
+from Helper import Loader
+from Helper import String
 
 
 def plotError(network, training_loss, cv_loss, loss_label):
@@ -79,9 +79,9 @@ def subroutine(param):
 		return [loss,closs,vloss,vcloss,name]
 
 if __name__ == '__main__':
-	[X_train, y_train] = Loader.loadData("HW1/data/digitstrain.txt")
-	[X_val, y_val] = Loader.loadData("HW1/data/digitsvalid.txt")
-	[X_test, y_test] = Loader.loadData("HW1/data/digitstest.txt")
+	[X_train, y_train] = Loader.loadData("../data/digitstrain.txt")
+	[X_val, y_val] = Loader.loadData("../data/digitsvalid.txt")
+	[X_test, y_test] = Loader.loadData("../data/digitstest.txt")
 
 	myNet = Network.Network()
 	# cv_res = cross_validation()
@@ -99,9 +99,9 @@ if __name__ == '__main__':
 	[loss, closs, vloss, vcloss] = myNet.trainAndValidate(X_train, y_train, X_test, y_test, epochs)
 	#
 	fig = plotError(myNet, loss, vloss, "Cross-entropy Loss")
-	fig.savefig('../HW1/Results/ce_two_layer_best.png', format='png')
+	fig.savefig('../Results/HW1/ce_two_layer_best.png', format='png')
 	fig = plotError(myNet, closs, vcloss, "Misclassification Error")
-	fig.savefig('../HW1/Results/mc_two_layer_best.png', format='png')
+	fig.savefig('../Results/HW1/mc_two_layer_best.png', format='png')
 	fig = myNet.visualizeLayer(1)
-	fig.savefig('../HW1/Results/visualize_weight_two_layer_best.png', format='png')
+	fig.savefig('../Results/HW1/visualize_weight_two_layer_best.png', format='png')
 
