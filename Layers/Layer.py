@@ -29,21 +29,9 @@ class Layer:
 		if self.dropout_rate != 0:
 			self.d_out *= (1 - self.dropout_rate)
 
-	@abstractmethod
-	def feedForward(self):
-		pass
-
 	def setInput(self, d_in):
 		assert isinstance(d_in, np.ndarray)
 		self.d_in = np.append(d_in, [1]) # add the bias term
-
-	@abstractmethod
-	def backProp(self, post_activation_gradient):
-		"""
-
-		:type post_activation_gradient: np.ndarray
-		"""
-		pass
 
 	def updateWeight(self, learning_rate):
 		self.weights -= learning_rate * self.weight_gradient
@@ -53,6 +41,29 @@ class Layer:
 
 	def dropout(self):
 		self.d_out *= np.random.binomial(1, self.dropout_rate, self.n_out)
+
+	@abstractmethod
+	def feedForward(self):
+		pass
+
+	@abstractmethod
+	def backProp(self, post_activation_gradient):
+		"""
+
+		:type post_activation_gradient: np.ndarray
+		"""
+		pass
+
+	@abstractmethod
+	def topLayerGrad(self, truth):
+		"""
+		Compute post-activation gradient for this being top layer
+		:param truth:
+		"""
+		pass
+
+	def reset(self):
+		self.__init__(self.n_in, self.n_out, self.momentum, self.reg_param, self.dropout_rate)
 
 	def __init__(self, n_in, n_out, momentum, reg_param, dropout):
 		self.n_in = n_in

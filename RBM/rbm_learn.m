@@ -12,8 +12,8 @@ W = (rand(p, h_num) - 0.5) * sqrt(6) / sqrt(p + h_num);    % Initialize weight m
 b = zeros(p, 1);    % p * 1
 a = zeros(h_num, 1);    % h * 1
 
-err_t = zeros(max_iter);
-err_v = zeros(max_iter);
+err_t = zeros(max_iter, 1);
+err_v = zeros(max_iter, 1);
 
 for iter = 1 : max_iter
 %     w_grad = zeros(size(W));

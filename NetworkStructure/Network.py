@@ -16,30 +16,6 @@ class Network:
 	momentum = 0.0
 	layers = list()
 
-	def visualizeLayer(self, layer_idx):
-		# Visualize i-th layer
-		assert layer_idx != 0
-		tmp = self.layers[layer_idx - 1].weights[:, :-1]
-		size = int(np.ceil(np.sqrt(self.n_units[layer_idx][0])))
-		f, axarr = plt.subplots(size, size)
-		for i in range(size):
-			for j in range(size):
-				idx = i * size + j
-				if idx >= tmp.shape[0]:
-					break
-				vis_dim = int(np.sqrt(self.n_units[layer_idx - 1][0]))
-				axarr[i,j].matshow(np.reshape(tmp[idx,:], [vis_dim, vis_dim]), cmap = plt.cm.gray)
-				axarr[i,j].axis('off')
-		return f
-
-	def printStruct(self):
-		s = self.getLayerStruct() + ";\n"
-		s += ("lr %0.2f; " % self.learning_rate)
-		s += ("dr %0.2f; " % self.dropout_rate)
-		s += ("momentum %0.2f; " % self.momentum)
-		s += ("l2 %0.2f" % self.l2_weight)
-		return s
-
 	def initNetwork(self):
 		# Check network is correctly specified
 		if (not self.isValidNetwork()):
@@ -67,9 +43,6 @@ class Network:
 		tmp.dropout_rate = 0.0	# Do not do dropout in output layer
 		self.layers = layers
 
-	def reset(self):
-		self.initNetwork()
-
 	def trainAndValidate(self, X_train, y_train, X_val, y_val, epoch):
 		cel_train = list()
 		cel_val = list()
@@ -95,8 +68,10 @@ class Network:
 		acc = list()
 		for i in range(len(y)):
 			self.forwardProp(X[i])
-			cel.append(self.getLoss(y[i], LossFun.crossEntropy))
-			acc.append(self.getLoss(y[i], LossFun.classificationError))
+			cel.append(self.getLoss(y[i], LossFun.seLoss))
+			acc.append(0)
+			# cel.append(self.getLoss(y[i], LossFun.crossEntropy))
+			# acc.append(self.getLoss(y[i], LossFun.classificationError))
 		return [np.mean(cel), np.mean(acc)]
 
 	def train(self, X, y, epoch):
@@ -107,8 +82,10 @@ class Network:
 			acc_accumulator = list()
 			for j in np.random.permutation(range(len(y))):
 				self.forwardPropTrain(X[j])
-				cel_accumulator.append(self.getLoss(y[j], LossFun.crossEntropy))
-				acc_accumulator.append(self.getLoss(y[j], LossFun.classificationError))
+				cel_accumulator.append(self.getLoss(y[j], LossFun.seLoss))
+				acc_accumulator.append(0)
+				# cel_accumulator.append(self.getLoss(y[j], LossFun.crossEntropy))
+				# acc_accumulator.append(self.getLoss(y[j], LossFun.classificationError))
 				self.backProp(y[j])
 			cel.append(np.mean(cel_accumulator))
 			acc.append(np.mean(acc_accumulator))
@@ -141,9 +118,7 @@ class Network:
 	def backProp(self, truth):
 		output_layer = self.layers[-1]
 		assert isinstance(output_layer, Layer)
-		grad = np.zeros(self.n_units[-1][0])
-		label = np.where(truth == 1)
-		grad[label] = - 1.0 / output_layer.d_out[label]
+		grad = output_layer.topLayerGrad(truth)
 		for layer in self.layers[::-1]:
 			assert isinstance(layer, Layer)
 			layer.backProp(grad)
@@ -194,6 +169,34 @@ class Network:
 
 		return "lr_" + String.sciFormat(self.learning_rate) + "_mo_" + String.sciFormat(self.momentum) + \
 			   "_hu_" + self.getLayerStruct() +"_l2_" + String.sciFormat(self.l2_weight) + "_dr_" + String.sciFormat(self.dropout_rate)
+
+	def visualizeLayer(self, layer_idx):
+		# Visualize i-th layer
+		assert layer_idx != 0
+		tmp = self.layers[layer_idx - 1].weights[:, :-1]
+		size = int(np.ceil(np.sqrt(self.n_units[layer_idx][0])))
+		f, axarr = plt.subplots(size, size)
+		for i in range(size):
+			for j in range(size):
+				idx = i * size + j
+				if idx >= tmp.shape[0]:
+					break
+				vis_dim = int(np.sqrt(self.n_units[layer_idx - 1][0]))
+				axarr[i,j].matshow(np.reshape(tmp[idx,:], [vis_dim, vis_dim]), cmap = plt.cm.gray)
+				axarr[i,j].axis('off')
+		return f
+
+	def printStruct(self):
+		s = self.getLayerStruct() + ";\n"
+		s += ("lr %0.2f; " % self.learning_rate)
+		s += ("dr %0.2f; " % self.dropout_rate)
+		s += ("momentum %0.2f; " % self.momentum)
+		s += ("l2 %0.2f" % self.l2_weight)
+		return s
+
+	def reset(self):
+		for layer in self.layers:
+			layer.reset()
 
 	def __init__(self):
 		return

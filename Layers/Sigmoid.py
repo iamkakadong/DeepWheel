@@ -6,6 +6,11 @@ from Layer import Layer
 
 class Sigmoid(Layer):
 
+	def topLayerGrad(self, truth):
+		assert len(truth) == self.n_out
+		grad = 2.0 * (self.d_out - truth)
+		return grad
+
 	def backProp(self, post_activation_gradient):
 		"""
 

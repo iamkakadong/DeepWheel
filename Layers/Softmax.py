@@ -6,6 +6,13 @@ from Layer import Layer
 
 class Softmax(Layer):
 
+	def topLayerGrad(self, truth):
+		assert len(truth) == self.n_out
+		grad = np.zeros(self.n_out)
+		label = np.where(truth == 1)
+		grad[label] = - 1.0 / self.d_out[label]
+		return grad
+
 	def feedForward(self):
 		assert self.hasIn()
 		self.d_out = Math.softmax(self.weights.dot(self.d_in))
