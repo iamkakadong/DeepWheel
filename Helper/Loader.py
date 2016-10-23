@@ -1,37 +1,37 @@
 import numpy as np
 
-def loadBinaryData(filename):
-	X = list()
+def load_binary_data(filename):
+	x = list()
 	y = list()
 	f = file(filename)
 	for line in f.readlines():
-		nums = map(lambda x : float(x), line.split(','))
-		[xt, yt] = toBinaryXY(nums)
-		X.append(xt)
+		nums = map(lambda e: float(e), line.split(','))
+		[xt, yt] = to_binary_xy(nums)
+		x.append(xt)
 		y.append(yt)
-	return [X, y]
+	return [x, y]
 
-def loadData(filename):
-	X = list()
+def load_data(filename):
+	x = list()
 	y = list()
 	f = file(filename)
 	for line in f.readlines():
-		nums = map(lambda x : float(x), line.split(','))
-		[xt, yt] = toXY(nums)
-		X.append(xt)
+		nums = map(lambda e: float(e), line.split(','))
+		[xt, yt] = to_xy(nums)
+		x.append(xt)
 		y.append(yt)
-	return [X, y]
+	return [x, y]
 
-def toXY(array):
-	X = np.array(array[0:-1])
+def to_xy(array):
+	x = np.array(array[0:-1])
 	label = int(array[-1])
 	y = np.zeros(10)
 	y[label] = 1
-	return X, y
+	return x, y
 
-def toBinaryXY(array):
-	X = (np.array(array[0:-1]) > 0.5).astype(int)
+def to_binary_xy(array):
+	x = (np.array(array[0:-1]) > 0.5).astype(int)
 	label = int(array[-1])
 	y = np.zeros(10)
 	y[label] = 1
-	return X, y
+	return x, y

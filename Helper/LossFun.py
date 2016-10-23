@@ -1,29 +1,25 @@
-from numpy import where, log, linalg
+import numpy as np
 
-def seLoss(predict, truth):
-	return linalg.norm(predict - truth)
+def square_error(predict, truth):
+	return np.linalg.norm(predict - truth)
 
-def crossEntropy(predict, truth):
-	# validateClassification(predict, truth)
-	validateBinaryPrediction(predict, truth)
-	return -log(predict[where(truth == 1)])
+def cross_entropy(predict, truth):
+	return sum(-np.log(predict[np.where(truth == 1)]))
 
-def classificationError(predict, truth):
-	# validateClassification(predict, truth)
+def misclassify_rate(predict, truth):
 	"""
 
-	:type predict: numpy.ndarray
+	:type truth: np.ndarray
+	:type predict: np.ndarray
 	"""
-	validateBinaryPrediction(predict, truth)
-	return sum((predict == truth).astype(int))
-	# plabel = where(predict == max(predict))
-	# tlabel = where(truth == 1)
-	# return plabel != tlabel
+	p_label = np.where(predict == max(predict))
+	t_label = np.where(truth == 1)
+	return p_label != t_label
 
-def validateClassification(predict, truth):
+def validate_classification(predict, truth):
 	assert sum(truth == 1) == 1 and sum(truth == 0) == len(truth) - 1
 	assert len(predict) == len(truth)
 
-def validateBinaryPrediction(predict, truth):
+def validate_binary_prediction(predict, truth):
 	assert len(predict) == len(truth)
 	assert sum(truth == 1) + sum(truth == 0) == len(truth)

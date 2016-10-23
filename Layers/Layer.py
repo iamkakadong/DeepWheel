@@ -16,38 +16,38 @@ class Layer:
 	gradient = np.ndarray([0])
 	weight_gradient = np.ndarray([0])
 	momentum = 0.0
-	reg_param = 0.0
+	l2_reg = 0.0
 	dropout_rate = 0.0
 
-	def feedForwardTrain(self):
-		self.feedForward()
+	def feed_forward_train(self):
+		self.feed_forward()
 		if self.dropout_rate != 0:
 			self.dropout()
 
-	def feedForwardTest(self):
-		self.feedForward()
+	def feed_forward_test(self):
+		self.feed_forward()
 		if self.dropout_rate != 0:
 			self.d_out *= (1 - self.dropout_rate)
 
-	def setInput(self, d_in):
+	def set_input(self, d_in):
 		assert isinstance(d_in, np.ndarray)
-		self.d_in = np.append(d_in, [1]) # add the bias term
+		self.d_in = np.append(d_in, [1])  # add the bias term
 
-	def updateWeight(self, learning_rate):
+	def update_weight(self, learning_rate):
 		self.weights -= learning_rate * self.weight_gradient
 
-	def hasIn(self):
-		return self.d_in != None
+	def has_in(self):
+		return self.d_in is not None
 
 	def dropout(self):
-		self.d_out *= np.random.binomial(1, self.dropout_rate, self.n_out)
+		self.d_out *= np.random.binomial(1, 1 - self.dropout_rate, self.n_out)
 
 	@abstractmethod
-	def feedForward(self):
+	def feed_forward(self):
 		pass
 
 	@abstractmethod
-	def backProp(self, post_activation_gradient):
+	def back_prop(self, post_activation_gradient):
 		"""
 
 		:type post_activation_gradient: np.ndarray
@@ -55,7 +55,7 @@ class Layer:
 		pass
 
 	@abstractmethod
-	def topLayerGrad(self, truth):
+	def top_layer_grad(self, truth):
 		"""
 		Compute post-activation gradient for this being top layer
 		:param truth:
@@ -63,14 +63,15 @@ class Layer:
 		pass
 
 	def reset(self):
-		self.__init__(self.n_in, self.n_out, self.momentum, self.reg_param, self.dropout_rate)
+		self.__init__(self.n_in, self.n_out, self.momentum, self.l2_reg, self.dropout_rate)
 
 	def __init__(self, n_in, n_out, momentum, reg_param, dropout):
 		self.n_in = n_in
 		self.n_out = n_out
-		self.weights = RandomInit.uniformInit([n_out, n_in + 1], -np.sqrt(6) / np.sqrt(n_in + n_out), np.sqrt(6) / np.sqrt(n_in + n_out))
-		self.weights[:,-1] = 0
+		self.weights = RandomInit.uniform_init([n_out, n_in + 1], -np.sqrt(6) / np.sqrt(n_in + n_out),
+											   np.sqrt(6) / np.sqrt(n_in + n_out))
+		self.weights[:, -1] = 0
 		self.weight_gradient = np.zeros([n_out, n_in + 1])
 		self.momentum = momentum
-		self.reg_param = reg_param
+		self.l2_reg = reg_param
 		self.dropout_rate = dropout

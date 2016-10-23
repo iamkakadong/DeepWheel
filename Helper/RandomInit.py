@@ -1,5 +1,5 @@
 from numpy.random import uniform
 
 
-def uniformInit(dim, lb, ub):
+def uniform_init(dim, lb, ub):
 	return uniform(lb, ub, dim)

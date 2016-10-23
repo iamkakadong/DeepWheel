@@ -3,7 +3,8 @@ import numpy as np
 def softmax(a):
 	"""
 
-	:rtype: ndarray
+	:type a: np.ndarray
+	:rtype: np.ndarray
 	"""
 
 	e_x = np.exp(a - np.max(a))
