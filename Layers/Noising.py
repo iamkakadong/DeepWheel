@@ -1,4 +1,5 @@
 from Layer import Layer
+import numpy as np
 
 class Noising(Layer):
 	is_binary = True
@@ -16,8 +17,9 @@ class Noising(Layer):
 	def feed_forward(self):
 		assert self.has_in()
 		self.d_out = self.d_in[0:-1]
-		# rn = (np.random.rand(self.n_out) > self.dropout_rate).astype(int)
-		# self.d_out = np.multiply(self.d_in[0:-1], rn)
+
+	def dropout(self):
+		self.d_out = np.random.binomial(1, 1 - self.dropout_rate, self.n_out)
 
 	def back_prop(self, post_activation_gradient):
 		self.gradient = post_activation_gradient

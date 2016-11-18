@@ -3,8 +3,15 @@ import numpy as np
 def square_error(predict, truth):
 	return np.linalg.norm(predict - truth)
 
+def softmax_entropy(predict, truth):
+	return -np.log(predict[np.where(truth == 1)])
+
 def cross_entropy(predict, truth):
-	return sum(-np.log(predict[np.where(truth == 1)]))
+	"""
+	:type predict: np.ndarray
+	:type truth: np.ndarray
+	"""
+	return - np.inner(np.log(predict), truth) - np.inner(np.log(1 - predict), 1 - truth)
 
 def misclassify_rate(predict, truth):
 	"""

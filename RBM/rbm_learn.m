@@ -16,9 +16,6 @@ err_t = zeros(max_iter, 1);
 err_v = zeros(max_iter, 1);
 
 for iter = 1 : max_iter
-%     w_grad = zeros(size(W));
-%     a_grad = zeros(size(a));
-%     b_grad = zeros(size(b));
     for i = randperm(n)
         v0 = train.X(i, :)'; % p * 1
         v = v0;
@@ -28,17 +25,11 @@ for iter = 1 : max_iter
         end
         p0 = cond_p(W, v0, h_bias);
         pk = cond_p(W, v, h_bias);
-%         w_grad = w_grad + (p0 * v0' - pk * v')';
-%         a_grad = a_grad + (p0 - pk);
-%         b_grad = b_grad + (v0 - v);
-%         err = err + ce(v0, W, h, b);
         W = W + step * (p0 * v0' - pk * v')';
         h_bias = h_bias + step * (p0 - pk);
         v_bias = v_bias + step * (v0 - v);
     end
-%     W = W + step * w_grad;
-%     a = a + step * a_grad;
-%     b = b + step * b_grad;
+    
     err = 0;
     for i = 1 : n
         vt = train.X(i, :)';

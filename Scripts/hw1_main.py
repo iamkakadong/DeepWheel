@@ -3,7 +3,7 @@ import os.path
 import matplotlib.pyplot as plt
 from traits.util.deprecated import deprecated
 
-from NetworkStructure import Network
+from Network import Network
 from Helper import Loader
 from Helper import String
 

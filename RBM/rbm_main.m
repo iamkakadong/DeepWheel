@@ -14,11 +14,26 @@ valid.X = (valid.X > 0.5) * 1;
 params = struct;
 params.h_num = 100;
 params.step = 1e-2;
-params.max_iter = 10;
-params.k = 10;
+params.max_iter = 50;
+params.k = 5;
 
-model = rbm_learn(train, valid, params);
-display_network(model.W);
+hls = [50, 100, 200, 500];
+models = cell(1,4);
+for idx = 1:4
+    params.h_num = hls(idx);
+    models{idx} = rbm_learn(train, valid, params);
+end
+save('models.mat', 'models');
+% display_network(model.W);
+
+%% Plotting error
+plot(model.err_t)
+hold on
+plot(model.err_v)
+legend('training error', 'validation error')
+xlabel('epochs')
+ylabel('cross-entropy')
+title('rbm CD-5 Hidden 100')
 
 %% Sampling
 imgs = zeros(784, 100);
@@ -27,6 +42,8 @@ for i = 1:100
 %     rd = randi([0,3000],1,1);
 %     v = digits(:,rd);
     for j = 1:1000
+%         h = cond_p(model.W, v, model.h_bias);
+%         v = cond_p(model.W', h, model.v_bias);
         h = sample_h(v, model.W, model.h_bias);
         v = sample_v(h, model.W, model.v_bias);
     end
